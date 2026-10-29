@@ -1,0 +1,18 @@
+{
+  "name": "tele-vdo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Streams every video of a Telegram channel (up to 2 GB each) on your site",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "login": "node login.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "big-integer": "^1.6.52",
+    "telegram": "^2.26.22"
+  }
+}

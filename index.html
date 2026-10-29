@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Public Drive Video Library</title>
+</head>
+<body>
+<main class="app" lang="en">
+  <nav class="topbar" aria-label="Main navigation">
+    <a class="brand" href="#home" aria-label="Public Drive Video Library home">
+      <span class="brand-mark">▶</span><span>PUBLIC DRIVE <b>VIDEO LIBRARY</b></span>
+    </a>
+    <div class="nav-actions">
+      <button id="home-tab" class="nav-button active" type="button" aria-pressed="true">Home</button>
+      <button id="tele-tab" class="nav-button" type="button" aria-pressed="false">Tele..VDO</button>
+      <button id="upload-tab" class="nav-button" type="button" aria-pressed="false">⬆ Upload</button>
+      <button id="settings-tab" class="nav-button" type="button" aria-pressed="false">⚙ Settings</button>
+    </div>
+  </nav>
+
+  <!-- HOME VIEW -->
+  <section id="home-view" class="view">
+    <header class="hero">
+      <div class="eyebrow"><span class="live-dot"></span> OPEN VIDEO LIBRARY</div>
+      <h1>Browse public folders,<br><span>play from Drive.</span></h1>
+      <p class="intro">Open a folder to see its subfolders and videos. Keep opening folders to browse deeper.</p>
+      <div class="toolbar">
+        <label class="search-box" for="folder-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="folder-search" type="search" placeholder="Search this folder…" autocomplete="off">
+        </label>
+        <button id="refresh-button" class="refresh-button" type="button"><span aria-hidden="true">↻</span> Refresh</button>
+      </div>
+    </header>
+
+    <div class="browse-heading">
+      <div>
+        <h2 id="contents-title">Shared Drive folders</h2>
+        <nav id="breadcrumbs" class="breadcrumbs" aria-label="Folder path"></nav>
+      </div>
+    </div>
+    <p id="sync-status" class="sync-status" role="status" aria-live="polite">Loading saved folders…</p>
+    <section id="folder-grid" class="folder-grid" aria-label="Folders"></section>
+    <section id="video-grid" class="video-grid" aria-label="Videos"></section>
+
+    <div id="empty-state" class="empty-state" hidden>
+      <div class="empty-icon">▣</div>
+      <h2 id="empty-title">No folders yet</h2>
+      <p id="empty-copy">Add a public Google Drive folder in Settings.</p>
+      <button id="empty-settings-button" class="secondary-button" type="button">Open Settings</button>
+    </div>
+    <p id="search-empty" class="empty-state compact" hidden>No folders or videos match that search.</p>
+  </section>
+
+  <!-- TELE..VDO VIEW -->
+  <section id="tele-view" class="view" hidden>
+    <header class="hero">
+      <div class="eyebrow"><span class="live-dot"></span> TELEGRAM CHANNEL</div>
+      <h1>Tele..VDO<br><span>every channel video.</span></h1>
+      <p class="intro">All videos from the channel play right here. New uploads show up automatically.</p>
+      <div class="toolbar">
+        <label class="search-box" for="tele-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="tele-search" type="search" placeholder="Search videos…" autocomplete="off">
+        </label>
+        <button id="tele-refresh" class="refresh-button" type="button"><span aria-hidden="true">↻</span> Refresh</button>
+      </div>
+    </header>
+    <p id="tele-status" class="sync-status" role="status" aria-live="polite">Loading videos…</p>
+    <section id="tele-grid" class="video-grid" aria-label="Telegram videos"></section>
+    <div class="tele-more-wrap"><button id="tele-more" class="secondary-button" type="button" hidden>Load more videos</button></div>
+    <div id="tele-empty" class="empty-state" hidden>
+      <div class="empty-icon">▶</div>
+      <h2>No videos found</h2>
+      <p>No videos match yet. If this is unexpected, check that the channel is public and the server is running.</p>
+    </div>
+    <button id="back-home-tele" class="text-button" type="button">← Back to folders</button>
+  </section>
+
+  <!-- UPLOAD VIEW -->
+  <section id="upload-view" class="view" hidden>
+    <header class="settings-heading">
+      <div class="eyebrow">UPLOAD MEDIA</div>
+      <h1>Upload Videos</h1>
+      <p>Upload videos directly into the shared Google Drive folder.</p>
+    </header>
+    
+    <div class="panel upload-info-panel">
+      <div class="panel-kicker">SHARED FOLDER UPLOADER</div>
+      <h2 style="margin-top:8px;">Add Multi-File Videos</h2>
+      
+      <label class="field-label" for="target-folder-select">Select Destination Folder</label>
+      <select id="target-folder-select" class="field" style="margin-bottom: 20px; cursor: pointer;">
+        <option value="">Loading saved folders…</option>
+      </select>
+
+      <p class="intro" style="font-size:14px; margin-bottom: 24px;">
+        Click below to open the shared Google Drive folder. You can drag and drop multiple videos at once with live upload percentage progress tracking.
+      </p>
+
+      <button id="open-drive-upload-btn" class="primary-button upload-direct-btn" type="button">
+        <span>⬆</span> Open Folder & Upload Videos ↗
+      </button>
+    </div>
+    
+    <button id="back-home-upload" class="text-button" type="button">← Back to folders</button>
+  </section>
+
+  <!-- SETTINGS VIEW -->
+  <section id="settings-view" class="view" hidden>
+    <header class="settings-heading">
+      <div class="eyebrow">SETTINGS</div>
+      <h1>Shared Folders</h1>
+      <p>Add any Google Drive folder shared with "Anyone with the link can view".</p>
+    </header>
+    <div class="settings-grid">
+      <section class="panel add-panel" aria-labelledby="add-heading">
+        <div class="panel-kicker">ADD A SOURCE</div>
+        <h2 id="add-heading">Add a Drive folder</h2>
+        <label class="field-label" for="new-label">Folder name <span>(optional)</span></label>
+        <input id="new-label" class="field" type="text" maxlength="80" placeholder="e.g. Web Developer Folder">
+        <label class="field-label" for="new-link">Google Drive folder link</label>
+        <input id="new-link" class="field" type="url" placeholder="https://drive.google.com/drive/folders/…" autocomplete="url">
+        <button id="add-folder-button" class="primary-button" type="button">＋ Add folder</button>
+        <p id="add-status" class="form-status" role="status" aria-live="polite"></p>
+        <p class="help-text">Paste a folder share link. Make sure the folder is set to "Anyone with the link can edit".</p>
+      </section>
+
+      <section class="panel folder-panel" aria-labelledby="folders-heading">
+        <div class="panel-kicker">SAVED SOURCES</div>
+        <h2 id="folders-heading">Connected folders <span id="folder-count" class="count-pill">0</span></h2>
+        <div id="folder-list" class="folder-list">
+          <p class="muted">Loading saved folders…</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel csv-panel" aria-labelledby="csv-heading">
+      <div class="panel-kicker">BACKUP & RESTORE</div>
+      <h2 id="csv-heading">Import / Export CSV</h2>
+      <p class="help-text">Back up your saved Drive folder list to a CSV file, or import a CSV to add folders. Importing keeps existing folders and skips duplicates.</p>
+      <div class="csv-actions">
+        <input id="csv-file-picker" type="file" accept=".csv,text/csv" hidden>
+        <button id="import-csv-button" class="secondary-button" type="button">⬆ Import CSV File</button>
+        <button id="export-csv-button" class="primary-button" type="button">⬇ Export CSV</button>
+      </div>
+      <p id="csv-status" class="form-status" role="status" aria-live="polite"></p>
+      <p class="help-text">CSV columns: <code>name,link</code>. You can also import files with <code>id</code> and <code>key</code> columns.</p>
+    </section>
+
+    <aside class="privacy-note">
+      <strong>Public access requirement:</strong> Added Google Drive folders must be shared publicly ("Anyone with the link can view"). No sign-in or account authorization is required.
+    </aside>
+    <button id="back-home" class="text-button" type="button">← Back to folders</button>
+  </section>
+
+  <footer class="footer">
+    <span>Videos stream from Google Drive</span>
+    <span id="last-sync">Folder contents load when opened and refresh every 5 minutes</span>
+  </footer>
+
+  <section id="edit-dialog" class="dialog-backdrop" hidden aria-label="Edit folder">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="edit-heading">
+      <div class="panel-kicker">FOLDER SETTINGS</div>
+      <h2 id="edit-heading">Edit folder</h2>
+      <label class="field-label" for="edit-label">Folder name</label>
+      <input id="edit-label" class="field" type="text" maxlength="80">
+      <label class="field-label" for="edit-link">Google Drive folder link</label>
+      <input id="edit-link" class="field" type="url" autocomplete="url">
+      <p id="edit-status" class="form-status" role="status" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button id="cancel-edit" class="secondary-button" type="button">Cancel</button>
+        <button id="save-edit" class="primary-button" type="button">Save changes</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<style>
+:root{color-scheme:dark;--bg:#090d12;--card:#121922;--line:#27323d;--text:#f3f6f8;--muted:#a2afbb;--green:#00b14f;--mint:#8ce2ba;--red:#ff8e8e}*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0;background:radial-gradient(ellipse at 50% -25%,#164239 0,transparent 44%),var(--bg);color:var(--text);font-family:Inter,"SF Pro Text","Segoe UI",Roboto,sans-serif}.app{max-width:1440px;min-height:100vh;margin:0 auto;padding:0 clamp(18px,5vw,72px) 24px}.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff14}.brand{display:flex;align-items:center;gap:11px;color:#f5faf7;text-decoration:none;font-size:12px;font-weight:800;letter-spacing:.12em}.brand b{color:#9eb3aa}.brand-mark{display:grid;place-items:center;width:34px;height:34px;padding-left:2px;border-radius:11px;background:var(--green);color:#07110a}.nav-actions{display:flex;gap:8px}.nav-button{border:1px solid transparent;border-radius:10px;background:transparent;color:#b2bec8;padding:10px 14px;font-size:14px;cursor:pointer}.nav-button:hover,.nav-button.active{background:#17221f;color:#effff6;border-color:#28493c}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #7ce1b4;outline-offset:3px}.hero{max-width:100%;margin:0;padding:40px 0 20px;text-align:left}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.18em;color:#9eb6ac}.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:8px}.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;letter-spacing:.012em;margin:14px 0 10px}.hero h1 span{color:#8fe0b4}.intro{max-width:600px;margin:0 0 20px;color:#adbac3;font-size:15px;line-height:1.55}.toolbar{display:flex;justify-content:flex-start;gap:10px;max-width:640px;margin:0}.search-box{height:50px;flex:1;display:flex;align-items:center;gap:10px;padding:0 15px;border:1px solid #34414b;border-radius:13px;background:#101720;text-align:left}.search-box>span{font-size:23px;color:#9eabb4}.search-box input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:15px}.search-box input::placeholder{color:#85929e}.refresh-button,.primary-button,.secondary-button{border:0;border-radius:11px;padding:12px 16px;font-size:14px;font-weight:750;cursor:pointer}.refresh-button{background:#1b2924;color:#c9f2d9;border:1px solid #305442;white-space:nowrap}.refresh-button:disabled,.primary-button:disabled{opacity:.55;cursor:wait}.browse-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:18px 0 5px}.browse-heading h2{font-size:19px;margin:0 0 8px}.breadcrumbs{display:flex;flex-wrap:wrap;gap:7px;align-items:center;color:#84949e;font-size:12px}.crumb{border:0;background:transparent;color:#a9d8bd;padding:0;cursor:pointer}.crumb.current{color:#f3f6f8;cursor:default}.crumb-sep{color:#63716f}.sync-status{min-height:20px;margin:8px 0 15px;font-size:12px;color:#98a7b1}.sync-status.error,.form-status.error{color:var(--red)}.sync-status.ok,.form-status.ok{color:var(--mint)}.folder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:13px;margin:10px 0 20px}.folder-card{display:flex;align-items:center;gap:13px;text-align:left;width:100%;min-width:0;padding:16px;border:1px solid #2c3d35;border-radius:15px;background:linear-gradient(145deg,#14221d,#101820);color:var(--text);cursor:pointer}.folder-card:hover{border-color:#438b63;background:#17271f}.folder-icon{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:12px;background:#1a3427;color:#9de5b9;font-size:20px}.folder-card-copy{min-width:0;flex:1}.folder-card-name{font-size:14px;font-weight:750;overflow-wrap:anywhere}.folder-card-sub{margin-top:5px;color:#8b9a9f;font-size:11px}.folder-arrow{color:#8de0b4;font-size:18px}
+.video-card{overflow:hidden;padding:16px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(155deg,#151e28,#10161d);min-width:0}.video-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}.video-title{font-size:16px;line-height:1.35;overflow-wrap:anywhere;margin:0}.folder-badge{max-width:45%;padding:6px 9px;border:1px solid #315043;border-radius:999px;color:#9ee2bb;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%,500px), 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.video-frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #2b3741;
+  border-radius: 12px;
+  background: #000000;
+}
+.video-frame iframe {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+}
+
+
+.video-frame iframe{max-width:100%;aspect-ratio:16/9;background:#000;}
+@supports not (aspect-ratio: 16 / 9){.video-frame{height:0;padding-top:56.25%;}}
+.video-meta{display:flex;justify-content:space-between;gap:10px;margin-top:11px;color:#909eaa;font-size:11px}.drive-link{color:#c5d4db;text-decoration:none}.drive-link:hover{text-decoration:underline;color:white}.upload-info-panel{max-width:640px;padding:28px;text-align:left}.upload-direct-btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-size:15px;padding:14px 20px}.empty-state{max-width:560px;margin:22px 0;padding:28px;text-align:left;border:1px dashed #37434d;border-radius:17px;color:#aebbc4}.empty-state h2{color:#eef3f4;font-size:19px;margin:12px 0 6px}.empty-state p{font-size:14px;line-height:1.5}.empty-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#173126;color:#8de0b4}.empty-state.compact{padding:16px}.footer{display:flex;justify-content:space-between;gap:12px;margin-top:38px;padding:17px 0 5px;border-top:1px solid #ffffff14;color:#788691;font-size:11px}.settings-heading{padding:32px 0 23px}.settings-heading h1{font-size:clamp(32px,5vw,48px);letter-spacing:.01em;margin:12px 0 8px}.settings-heading p{color:#aab7c0;line-height:1.55;margin:0}.settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.csv-panel{margin-top:18px}.csv-actions{display:flex;flex-wrap:wrap;gap:10px}.csv-actions .primary-button,.csv-actions .secondary-button{margin-top:0}.panel{padding:21px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(155deg,#141d26,#10161e)}.panel-kicker{font-size:10px;font-weight:800;letter-spacing:.17em;color:#92b7a5}.panel h2{font-size:19px;margin:8px 0 17px}.count-pill{display:inline-flex;align-items:center;justify-content:center;min-width:25px;height:22px;padding:0 7px;border-radius:999px;background:#1a2b23;color:#abebc6;font-size:11px}.field-label{display:block;margin:15px 0 7px;color:#c2cdd3;font-size:13px;font-weight:650}.field-label span{color:#84919c;font-weight:400}.field{display:block;width:100%;height:44px;padding:0 12px;border:1px solid #35424c;border-radius:10px;background:#0c1218;color:#f3f6f8;font-size:14px}.field::placeholder{color:#74818c}.primary-button{margin-top:15px;background:var(--green);color:#07140b}.secondary-button{background:#202a33;color:#d2dce0;border:1px solid #3a4650}.form-status{min-height:18px;margin:10px 0 0;font-size:12px;color:#9aa7b1}.help-text,.muted{color:#8997a1;font-size:12px;line-height:1.55}.folder-list{display:flex;flex-direction:column;gap:10px}.folder-row{padding:12px;border:1px solid #2a3540;border-radius:12px;background:#0d141a}.folder-row-top{display:flex;justify-content:space-between;gap:12px;align-items:center}.folder-name{font-size:14px;font-weight:700;overflow-wrap:anywhere}.folder-sub{margin-top:5px;color:#82919c;font-size:11px}.folder-actions{display:flex;gap:7px;flex-wrap:wrap}.small-button{border:1px solid #38454e;border-radius:8px;background:#182129;color:#d2dce0;padding:7px 10px;font-size:11px;cursor:pointer}.small-button.danger{border-color:#643e43;color:#ffb3b3}.privacy-note{margin-top:18px;padding:15px 17px;border-left:3px solid #358d60;border-radius:0 10px 10px 0;background:#111a18;color:#aab9b4;font-size:12px;line-height:1.6}.privacy-note strong{color:#d4eadc}.text-button{margin-top:22px;border:0;background:transparent;color:#b9c7cd;font-size:13px;cursor:pointer}.dialog-backdrop{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:18px;background:#000b}.dialog{width:min(100%,520px);padding:22px;border:1px solid #3a4650;border-radius:16px;background:#121a22}.dialog h2{margin:8px 0 16px;font-size:22px}.dialog-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:13px}.dialog-actions .primary-button{margin:0}@media(max-width:760px){.app{padding-left:16px;padding-right:16px}.topbar{height:66px}.hero{padding-top:24px}.settings-grid{grid-template-columns:1fr}}@media(max-width:500px){.brand{font-size:10px;letter-spacing:.08em}.brand-mark{width:30px;height:30px}.nav-button{padding:9px 10px;font-size:12px}.hero h1{font-size:36px}.toolbar{align-items:stretch}.search-box{min-width:0}.refresh-button{padding:10px}.footer{flex-direction:column}.folder-row-top{align-items:flex-start;flex-direction:column}}
+
+/* Responsive layout improvements: laptop, tablet, and mobile */
+.app{width:100%;}
+button,input,select{max-width:100%;}
+.panel,.video-card,.folder-card{min-width:0;}
+@media (min-width: 1100px){
+  .folder-grid{grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:16px;}
+  .video-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:20px;}
+  .hero{padding-top:48px;padding-bottom:26px;}
+  .settings-grid{gap:22px;}
+  .panel{padding:24px;}
+}
+@media (max-width: 760px){
+  .app{padding:0 16px 22px;}
+  .topbar{height:auto;min-height:66px;padding:12px 0;gap:12px;align-items:center;flex-wrap:wrap;}
+  .brand{min-width:0;flex:1;}
+  .nav-actions{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;}
+  .nav-button{padding:11px 8px;min-height:42px;text-align:center;white-space:nowrap;}
+  .hero{padding:25px 0 17px;}
+  .hero h1{font-size:clamp(30px,6vw,42px);}
+  .toolbar{width:100%;max-width:none;}
+  .settings-heading{padding:26px 0 20px;}
+  .settings-grid{grid-template-columns:minmax(0,1fr);gap:14px;}
+  .csv-panel{margin-top:14px;}
+  .panel{padding:18px;}
+  .upload-info-panel{max-width:none;padding:20px;}
+  .video-grid{grid-template-columns:minmax(0,1fr);gap:14px;}
+  .folder-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px;}
+  .browse-heading{align-items:flex-start;flex-direction:column;}
+  .footer{margin-top:26px;}
+}
+@media (max-width: 480px){
+  .app{padding-right:12px;padding-left:12px;}
+  .topbar{gap:10px;}
+  .brand{font-size:10px;letter-spacing:.045em;gap:8px;}
+  .brand-mark{width:29px;height:29px;flex-shrink:0;}
+  .nav-actions{gap:5px;}
+  .nav-button{font-size:12px;padding:10px 4px;border-radius:9px;}
+  .hero h1{font-size:32px;}
+  .intro{font-size:14px;}
+  .toolbar{flex-direction:column;gap:8px;}
+  .search-box{width:100%;min-height:46px;}
+  .refresh-button{width:100%;min-height:42px;}
+  .folder-grid{grid-template-columns:minmax(0,1fr);}
+  .folder-card{padding:13px;border-radius:12px;}
+  .video-card{padding:12px;}
+  .video-head{flex-direction:column;}
+  .folder-badge{max-width:100%;}
+  .video-meta{flex-wrap:wrap;overflow-wrap:anywhere;}
+  .panel{padding:15px;border-radius:13px;}
+  .field{font-size:16px;min-width:0;} /* avoids mobile browser zoom on focus */
+  .primary-button,.secondary-button,.upload-direct-btn{width:100%;justify-content:center;white-space:normal;}
+  .csv-actions{display:grid;grid-template-columns:minmax(0,1fr);}
+  .csv-actions .primary-button,.csv-actions .secondary-button{width:100%;}
+  .folder-row-top{flex-direction:column;align-items:stretch;}
+  .folder-actions{width:100%;}
+  .small-button{min-height:36px;}
+  .dialog-backdrop{padding:10px;}
+  .dialog{padding:17px;max-height:90dvh;overflow-y:auto;}
+  .dialog-actions{flex-wrap:wrap;}
+  .dialog-actions button{flex:1;}
+}
+
+/* Tele..VDO */
+.video-frame video{position:absolute;inset:0;display:block;width:100%;height:100%;background:#000;object-fit:contain}
+.tele-frame{border:1px solid #2b3741;border-radius:12px;overflow:hidden;background:#0e1621}
+.tele-frame iframe{display:block;width:100%;height:420px;min-height:80px;border:0;max-width:100%}
+.tele-more-wrap{display:flex;justify-content:center;margin:18px 0 4px}
+.tele-more-wrap .secondary-button{min-width:200px}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+</style>
+
+<script>
+(function(){'use strict';
+  const GOOGLE_API_KEY = 'AIzaSyAm_zSnfZuzMw6_QW107prTboJM61N5WIg';
+  const STORAGE_KEY = 'public_drive_folders';
+  // Public Telegram channel (username without @)
+  const TELEGRAM_CHANNEL = 'rothy_video_library';
+  // Address of the Tele..VDO server (server.js). Leave '' when server.js also serves this page.
+  // If this page is hosted somewhere else, put the server address here, e.g. 'https://my-app.onrender.com'
+  const TELE_API_BASE = '';
+  const DEFAULT_FOLDER = {
+    key: 'folders/1nUBqI5gKYmWwTuoQAMj9T-0y6_mxaq_6',
+    id: '1nUBqI5gKYmWwTuoQAMj9T-0y6_mxaq_6',
+    name: 'Web Developer Folder',
+    link: 'https://drive.google.com/drive/folders/1nUBqI5gKYmWwTuoQAMj9T-0y6_mxaq_6'
+  };
+  const MAX_ITEMS = 3000, REFRESH_MS = 300000;
+
+  const homeTab=document.getElementById('home-tab'),uploadTab=document.getElementById('upload-tab'),settingsTab=document.getElementById('settings-tab'),homeView=document.getElementById('home-view'),uploadView=document.getElementById('upload-view'),settingsView=document.getElementById('settings-view'),folderGrid=document.getElementById('folder-grid'),videoGrid=document.getElementById('video-grid'),syncStatus=document.getElementById('sync-status'),lastSync=document.getElementById('last-sync'),emptyState=document.getElementById('empty-state'),emptyTitle=document.getElementById('empty-title'),emptyCopy=document.getElementById('empty-copy'),searchEmpty=document.getElementById('search-empty'),search=document.getElementById('folder-search'),folderList=document.getElementById('folder-list'),folderCount=document.getElementById('folder-count'),addStatus=document.getElementById('add-status'),addButton=document.getElementById('add-folder-button'),editDialog=document.getElementById('edit-dialog'),editStatus=document.getElementById('edit-status');
+  const targetFolderSelect=document.getElementById('target-folder-select'),openDriveUploadBtn=document.getElementById('open-drive-upload-btn');
+  const csvFilePicker=document.getElementById('csv-file-picker');
+  const importCsvButton=document.getElementById('import-csv-button');
+  const exportCsvButton=document.getElementById('export-csv-button');
+  const csvStatus=document.getElementById('csv-status');
+
+  let folders=[],path=[],currentFolders=[],currentVideos=[],busy=false,editingKey='',timer=null;
+
+  function setMessage(el,text,kind){el.textContent=text;el.className=(el.id==='sync-status'?'sync-status':'form-status')+(kind?' '+kind:'');}
+  
+  function showView(name){
+    const isHome = name === 'home';
+    const isUpload = name === 'upload';
+    const isSettings = name === 'settings';
+    const isTele = name === 'tele';
+
+    teleView.hidden = !isTele;
+    teleTab.classList.toggle('active', isTele);
+    teleTab.setAttribute('aria-pressed', String(isTele));
+
+    homeView.hidden = !isHome;
+    uploadView.hidden = !isUpload;
+    settingsView.hidden = !isSettings;
+
+    homeTab.classList.toggle('active', isHome);
+    uploadTab.classList.toggle('active', isUpload);
+    settingsTab.classList.toggle('active', isSettings);
+
+    homeTab.setAttribute('aria-pressed', String(isHome));
+    uploadTab.setAttribute('aria-pressed', String(isUpload));
+    settingsTab.setAttribute('aria-pressed', String(isSettings));
+
+    if (isUpload) renderUploadFolderOptions();
+    if (isTele) openTele();
+  }
+
+  function validId(v){return typeof v==='string'&&/^[A-Za-z0-9_-]{5,200}$/.test(v);}
+
+  function extractFolderId(value){
+    const link=String(value||'').trim();
+    if(!link) throw new Error('Paste a Google Drive folder link.');
+    const match = link.match(/\/folders\/([A-Za-z0-9_-]+)/);
+    if(match && validId(match[1])) return match[1];
+    if(validId(link)) return link;
+    throw new Error('Use a valid Google Drive folder link.');
+  }
+
+  function validateFolderLink(value){
+    const id = extractFolderId(value);
+    return 'https://drive.google.com/drive/folders/' + id;
+  }
+
+  function loadLocalFolders(){
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (data) {
+        return JSON.parse(data);
+      }
+    } catch(e) {}
+    saveLocalFolders([DEFAULT_FOLDER]);
+    return [DEFAULT_FOLDER];
+  }
+
+  function saveLocalFolders(list){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch(e){}
+  }
+
+  function renderUploadFolderOptions(){
+    targetFolderSelect.replaceChildren();
+    if(!folders.length){
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'No saved folders found. Add one in Settings.';
+      targetFolderSelect.appendChild(opt);
+      return;
+    }
+    folders.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.link;
+      opt.textContent = f.name;
+      targetFolderSelect.appendChild(opt);
+    });
+  }
+
+  async function listFolderPage(folderId, pageToken, pageSize){
+    if (!GOOGLE_API_KEY) {
+      throw new Error('Google Drive API key is missing.');
+    }
+    const q = encodeURIComponent(`'${folderId}' in parents and trashed = false`);
+    let url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,mimeType,modifiedTime,webViewLink)&pageSize=${pageSize||100}&key=${GOOGLE_API_KEY}`;
+    if (pageToken) url += `&pageToken=${encodeURIComponent(pageToken)}`;
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error((err.error && err.error.message) || 'Failed to fetch contents from Google Drive.');
+    }
+    return await res.json();
+  }
+
+  async function readFolders(){
+    const list = loadLocalFolders();
+    return list.sort((a,b) => a.name.localeCompare(b.name));
+  }
+
+  function linkForChild(file){
+    return 'https://drive.google.com/drive/folders/' + encodeURIComponent(file.id);
+  }
+
+  async function scanFolder(folder){
+    let token = null, pages = 0, subfolders = [], videos = [];
+    const folderId = extractFolderId(folder.link || folder.id);
+
+    do {
+      if (pages >= 30) throw new Error('Folder contains too many items (exceeds 3,000).');
+      const r = await listFolderPage(folderId, token, 100);
+      (r.files || []).forEach(f => {
+        if (!f || !validId(f.id) || typeof f.mimeType !== 'string') return;
+        const name = String(f.name || 'Untitled');
+        if (f.mimeType === 'application/vnd.google-apps.folder') {
+          subfolders.push({ id: f.id, name: name, link: linkForChild(f) });
+        } else if (f.mimeType.toLowerCase().startsWith('video/')) {
+          videos.push({ id: f.id, name: name, modifiedTime: f.modifiedTime || '', folderLabel: folder.name || 'Drive folder' });
+        }
+      });
+      token = r.nextPageToken || null;
+      pages++;
+      if (subfolders.length + videos.length > MAX_ITEMS) {
+        throw new Error('This folder has more than 3,000 items.');
+      }
+    } while(token);
+
+    subfolders.sort((a,b) => a.name.localeCompare(b.name));
+    videos.sort((a,b) => a.name.localeCompare(b.name));
+    return { subfolders: subfolders, videos: videos };
+  }
+
+  function renderBreadcrumbs(){
+    const el = document.getElementById('breadcrumbs');
+    el.replaceChildren();
+    function add(label, index, last){
+      if(el.childNodes.length){
+        const sep = document.createElement('span');
+        sep.className = 'crumb-sep';
+        sep.textContent = '›';
+        el.appendChild(sep);
+      }
+      if(last){
+        const s = document.createElement('span');
+        s.className = 'crumb current';
+        s.setAttribute('aria-current', 'page');
+        s.textContent = label;
+        el.appendChild(s);
+      } else {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'crumb';
+        b.textContent = label;
+        b.addEventListener('click', function(){
+          path = index < 0 ? [] : path.slice(0, index + 1);
+          refreshCurrent(false);
+        });
+        el.appendChild(b);
+      }
+    }
+    add('My folders', -1, path.length === 0);
+    path.forEach((f, i) => add(f.name, i, i === path.length - 1));
+  }
+
+  function makeFolderCard(folder, caption, ancestors){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'folder-card';
+    const icon = document.createElement('span');
+    icon.className = 'folder-icon';
+    icon.textContent = '▣';
+    const copy = document.createElement('span');
+    copy.className = 'folder-card-copy';
+    const n = document.createElement('span');
+    n.className = 'folder-card-name';
+    n.textContent = folder.name;
+    const sub = document.createElement('span');
+    sub.className = 'folder-card-sub';
+    sub.textContent = caption;
+    copy.append(n, sub);
+    const arrow = document.createElement('span');
+    arrow.className = 'folder-arrow';
+    arrow.textContent = '›';
+    b.append(icon, copy, arrow);
+    b.addEventListener('click', function(){ openFolder(folder, ancestors); });
+    return b;
+  }
+
+  function renderSettings(){
+    folderCount.textContent = String(folders.length);
+    folderList.replaceChildren();
+    if(!folders.length){
+      const p = document.createElement('p');
+      p.className = 'muted';
+      p.textContent = 'No folders connected yet. Add a public Drive folder link above.';
+      folderList.appendChild(p);
+      return;
+    }
+    folders.forEach(function(f){
+      const row = document.createElement('div');
+      row.className = 'folder-row';
+      const top = document.createElement('div');
+      top.className = 'folder-row-top';
+      const info = document.createElement('div'), name = document.createElement('div'), sub = document.createElement('div');
+      name.className = 'folder-name';
+      name.textContent = f.name;
+      sub.className = 'folder-sub';
+      sub.textContent = 'Public Google Drive folder';
+      info.append(name, sub);
+      const actions = document.createElement('div');
+      actions.className = 'folder-actions';
+      const browse = document.createElement('button');
+      browse.type = 'button';
+      browse.className = 'small-button';
+      browse.textContent = 'Browse';
+      browse.addEventListener('click', function(){ showView('home'); openFolder(f, []); });
+      const edit = document.createElement('button');
+      edit.type = 'button';
+      edit.className = 'small-button';
+      edit.textContent = 'Edit';
+      edit.addEventListener('click', function(){ openEdit(f); });
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'small-button danger';
+      remove.textContent = 'Remove';
+      remove.addEventListener('click', function(){ confirmRemove(f, remove); });
+      actions.append(browse, edit, remove);
+      top.append(info, actions);
+      row.appendChild(top);
+      folderList.appendChild(row);
+    });
+  }
+
+  function makeVideoCard(v){
+    const card = document.createElement('article');
+    card.className = 'video-card';
+    const head = document.createElement('div');
+    head.className = 'video-head';
+    const title = document.createElement('h3');
+    title.className = 'video-title';
+    title.textContent = v.name;
+    const badge = document.createElement('span');
+    badge.className = 'folder-badge';
+    badge.textContent = v.folderLabel;
+    head.append(title, badge);
+
+    const frame = document.createElement('div');
+    frame.className = 'video-frame';
+    
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://drive.google.com/file/d/' + encodeURIComponent(v.id) + '/preview';
+    iframe.title = v.name;
+    iframe.loading = 'lazy';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+    iframe.allowFullscreen = true;
+    frame.appendChild(iframe);
+
+    const meta = document.createElement('div');
+    meta.className = 'video-meta';
+    const stream = document.createElement('span');
+    stream.textContent = 'Streams from Drive';
+    const link = document.createElement('a');
+    link.className = 'drive-link';
+    link.href = 'https://drive.google.com/file/d/' + encodeURIComponent(v.id) + '/view';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'Open in Drive ↗';
+    meta.append(stream, link);
+    card.append(head, frame, meta);
+    return card;
+  }
+
+  function renderBrowse(){
+    folderGrid.replaceChildren();
+    videoGrid.replaceChildren();
+    renderBreadcrumbs();
+    const query = search.value.trim().toLocaleLowerCase();
+    let allCount = 0, shown = 0;
+
+    if(!path.length){
+      document.getElementById('contents-title').textContent = 'Shared Drive folders';
+      folders.forEach(function(f){
+        allCount++;
+        if(query && !f.name.toLocaleLowerCase().includes(query)) return;
+        folderGrid.appendChild(makeFolderCard(f, 'Public Drive folder', []));
+        shown++;
+      });
+    } else {
+      const current = path[path.length - 1];
+      document.getElementById('contents-title').textContent = current.name;
+      currentFolders.forEach(function(f){
+        allCount++;
+        if(query && !f.name.toLocaleLowerCase().includes(query)) return;
+        folderGrid.appendChild(makeFolderCard(f, 'Subfolder', path));
+        shown++;
+      });
+      currentVideos.forEach(function(v){
+        allCount++;
+        if(query && !v.name.toLocaleLowerCase().includes(query)) return;
+        videoGrid.appendChild(makeVideoCard(v));
+        shown++;
+      });
+    }
+
+    const none = allCount === 0;
+    emptyState.hidden = !none;
+    searchEmpty.hidden = none || shown > 0 || !query;
+    if(none){
+      emptyTitle.textContent = path.length ? 'This folder is empty' : 'No folders yet';
+      emptyCopy.textContent = path.length ? 'No subfolders or videos were found here.' : 'Add a public Google Drive folder in Settings.';
+      document.getElementById('empty-settings-button').hidden = path.length > 0;
+    }
+  }
+
+  async function openFolder(folder, ancestors){
+    if(busy) return;
+    path = ancestors.concat([folder]);
+    search.value = '';
+    showView('home');
+    await refreshCurrent(false);
+  }
+
+  async function refreshCurrent(silent){
+    if(busy) return;
+    busy = true;
+    const btn = document.getElementById('refresh-button');
+    btn.disabled = true;
+    document.getElementById('folder-grid').setAttribute('aria-busy', 'true');
+    syncStatus.className = 'sync-status';
+    syncStatus.textContent = path.length ? 'Loading ' + path[path.length - 1].name + '…' : 'Loading saved folders…';
+
+    try {
+      folders = await readFolders();
+      renderSettings();
+
+      if(!path.length){
+        currentFolders = [];
+        currentVideos = [];
+        renderBrowse();
+        syncStatus.textContent = folders.length ? 'Showing ' + folders.length + ' public Drive folder' + (folders.length === 1 ? '' : 's') + '.' : 'No folders connected. Add one in Settings.';
+        syncStatus.className = 'sync-status ' + (folders.length ? 'ok' : '');
+        lastSync.textContent = 'Open a folder to load its contents';
+        return;
+      }
+
+      const current = path[path.length - 1];
+      const data = await scanFolder(current);
+      currentFolders = data.subfolders;
+      currentVideos = data.videos;
+      renderBrowse();
+
+      const t = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      syncStatus.textContent = 'Loaded ' + currentFolders.length + ' subfolder' + (currentFolders.length === 1 ? '' : 's') + ' and ' + currentVideos.length + ' video' + (currentVideos.length === 1 ? '' : 's') + '.';
+      syncStatus.className = 'sync-status ok';
+      lastSync.textContent = 'Last checked ' + t + ' · refreshes every 5 minutes';
+    } catch(error) {
+      folderGrid.replaceChildren();
+      videoGrid.replaceChildren();
+      emptyState.hidden = true;
+      searchEmpty.hidden = true;
+      syncStatus.className = 'sync-status error';
+      syncStatus.textContent = 'Could not load folder: ' + error.message;
+      lastSync.textContent = 'No current folder listing';
+    } finally {
+      busy = false;
+      btn.disabled = false;
+      document.getElementById('folder-grid').removeAttribute('aria-busy');
+    }
+  }
+
+  function openEdit(f){
+    editingKey = f.key;
+    document.getElementById('edit-label').value = f.name;
+    document.getElementById('edit-link').value = f.link;
+    setMessage(editStatus, '', '');
+    editDialog.hidden = false;
+    document.getElementById('edit-label').focus();
+  }
+
+  function closeEdit(){
+    editDialog.hidden = true;
+    editingKey = '';
+    setMessage(editStatus, '', '');
+  }
+
+  async function addFolder(){
+    const linkInput = document.getElementById('new-link'), labelInput = document.getElementById('new-label');
+    addButton.disabled = true;
+    setMessage(addStatus, 'Checking folder link…', '');
+
+    try {
+      const link = validateFolderLink(linkInput.value);
+      const folderId = extractFolderId(link);
+      const key = 'folders/' + folderId;
+      const list = loadLocalFolders();
+
+      if(list.some(f => f.key === key)){
+        setMessage(addStatus, 'That folder is already added.', 'error');
+        return;
+      }
+
+      const label = labelInput.value.trim().slice(0, 80) || 'Public Drive folder';
+      list.push({ key: key, id: folderId, name: label, link: link });
+      saveLocalFolders(list);
+
+      setMessage(addStatus, 'Folder added successfully.', 'ok');
+      labelInput.value = '';
+      linkInput.value = '';
+      path = [];
+      await refreshCurrent(false);
+    } catch(error) {
+      setMessage(addStatus, error.message || 'Could not add folder.', 'error');
+    } finally {
+      addButton.disabled = false;
+    }
+  }
+
+  async function saveEdit(){
+    const save = document.getElementById('save-edit');
+    save.disabled = true;
+    setMessage(editStatus, 'Saving changes…', '');
+
+    try {
+      const newLink = validateFolderLink(document.getElementById('edit-link').value);
+      const newId = extractFolderId(newLink);
+      const newKey = 'folders/' + newId;
+      const label = document.getElementById('edit-label').value.trim().slice(0, 80) || 'Public Drive folder';
+      let list = loadLocalFolders();
+
+      const idx = list.findIndex(f => f.key === editingKey);
+      if(idx === -1) throw new Error('Folder entry not found.');
+
+      list[idx] = { key: newKey, id: newId, name: label, link: newLink };
+      saveLocalFolders(list);
+
+      closeEdit();
+      path = [];
+      await refreshCurrent(false);
+    } catch(error) {
+      setMessage(editStatus, error.message || 'Could not save folder changes.', 'error');
+    } finally {
+      save.disabled = false;
+    }
+  }
+
+  async function confirmRemove(f, button){
+    if(button.dataset.armed !== 'yes'){
+      button.dataset.armed = 'yes';
+      button.textContent = 'Confirm remove';
+      return;
+    }
+    let list = loadLocalFolders();
+    list = list.filter(item => item.key !== f.key);
+    saveLocalFolders(list);
+    path = [];
+    await refreshCurrent(false);
+  }
+
+  // ---- Tele..VDO: every video of the Telegram channel ----
+  const teleView=document.getElementById('tele-view'),teleTab=document.getElementById('tele-tab'),teleGrid=document.getElementById('tele-grid'),teleEmpty=document.getElementById('tele-empty'),teleStatus=document.getElementById('tele-status'),teleSearch=document.getElementById('tele-search'),teleMore=document.getElementById('tele-more');
+  const TELE_PAGE=12;
+  let teleAll=[], teleShown=0, teleLoadedAt=0, teleSound=false;
+  const teleUrl=function(u){ return u ? (/^https?:/i.test(u) ? u : TELE_API_BASE+u) : ''; };
+
+  // Autoplay: exactly ONE video plays at a time - the one that is most on screen (muted, as browsers
+  // require until the viewer unmutes once; after that later videos play with sound).
+  const teleRatios = new Map();      // video element -> how much of it is visible (0..1)
+  let teleActive = null, telePickTimer = 0, teleUserPaused = new WeakSet();
+  const teleDone = new WeakSet();    // videos that played to the end while still on screen
+  const teleProg = new WeakSet();    // pauses made by this script (not by the viewer)
+  function teleAutoPause(o){ if(!o.paused){ teleProg.add(o); o.pause(); } }
+
+  function teleMarkMuted(vid, on){
+    vid.muted = on; vid.defaultMuted = on;
+    if(on) vid.setAttribute('muted',''); else vid.removeAttribute('muted');
+  }
+  function playTele(vid){
+    if(!vid || !vid.isConnected) return;
+    teleGrid.querySelectorAll('video').forEach(function(o){ if(o!==vid) teleAutoPause(o); });
+    teleActive = vid;
+    teleMarkMuted(vid, !teleSound);
+    const p = vid.play();
+    if(p && p.catch) p.catch(function(err){
+      if(err && err.name==='AbortError') return;                 // we were interrupted on purpose; do not retry
+      if(teleActive!==vid) return;
+      teleMarkMuted(vid, true);                                   // sound not allowed yet -> play muted
+      vid.play().catch(function(){});
+    });
+  }
+  function pickTele(){
+    telePickTimer = 0;
+    // Candidates: videos at least half on screen that have not just finished. Closest to the screen centre wins.
+    let best = null, bestDist = Infinity;
+    teleRatios.forEach(function(r, el){
+      if(!el.isConnected){ teleRatios.delete(el); teleDone.delete(el); return; }
+      if(r < 0.5){ teleDone.delete(el); return; }          // left the screen: may autoplay again when it returns
+      if(teleDone.has(el)) return;
+      const b = el.getBoundingClientRect();
+      const dist = Math.abs((b.top + b.bottom) / 2 - window.innerHeight / 2);
+      if(dist < bestDist){ best = el; bestDist = dist; }
+    });
+    teleGrid.querySelectorAll('video').forEach(function(o){ if(o!==best){ teleAutoPause(o); teleUserPaused.delete(o); } });
+    if(best){
+      if(best !== teleActive || best.paused){ if(!teleUserPaused.has(best)) playTele(best); }
+    } else teleActive = null;
+  }
+  function schedulePick(){ if(!telePickTimer) telePickTimer = setTimeout(pickTele, 120); }
+  const teleObserver=('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ teleRatios.set(en.target, en.isIntersecting ? en.intersectionRatio : 0); });
+    schedulePick();
+  },{threshold:[0,0.25,0.5,0.75,1]}) : null;
+
+  // Start the first video right after the Tele..VDO button is pressed (that click allows playback).
+  function teleStartFirst(){
+    const first = teleGrid.querySelector('video');
+    if(!first) return;
+    const r = first.getBoundingClientRect();
+    if(r.top < 0 || r.bottom > window.innerHeight){ first.scrollIntoView({behavior:'auto', block:'center'}); }
+    teleUserPaused = new WeakSet();
+    playTele(first);
+  }
+
+  function teleFiltered(){
+    const q=teleSearch.value.trim().toLowerCase();
+    if(!q) return teleAll;
+    return teleAll.filter(function(v){ return ((v.title||'')+' '+(v.text||'')+' #'+v.id).toLowerCase().indexOf(q)!==-1; });
+  }
+
+  function teleEmbedFrame(id){
+    const wrap=document.createElement('div'); wrap.className='tele-frame';
+    const f=document.createElement('iframe');
+    f.src='https://t.me/'+encodeURIComponent(TELEGRAM_CHANNEL)+'/'+id+'?embed=1&mode=tme&dark=1';
+    f.title='Telegram video '+id; f.loading='lazy'; f.setAttribute('scrolling','no');
+    f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen'; f.allowFullscreen=true;
+    wrap.appendChild(f);
+    return wrap;
+  }
+
+  function makeTeleCard(v){
+    const card=document.createElement('article'); card.className='video-card';
+    const head=document.createElement('div'); head.className='video-head';
+    const title=document.createElement('h3'); title.className='video-title'; title.textContent=v.title||('Video #'+v.id);
+    const badge=document.createElement('span'); badge.className='folder-badge'; badge.textContent='@'+TELEGRAM_CHANNEL;
+    head.append(title,badge);
+
+    const srcUrl=teleUrl(v.stream||v.src);
+    let frame;
+    if(srcUrl){
+      frame=document.createElement('div'); frame.className='video-frame';
+      const video=document.createElement('video');
+      video.controls=true; video.preload='metadata'; video.playsInline=true;
+      video.setAttribute('playsinline',''); video.setAttribute('webkit-playsinline','');
+      teleMarkMuted(video, true);                       // muted from the start = autoplay is always allowed
+      video.setAttribute('referrerpolicy','no-referrer');
+      if(v.thumb) video.poster=teleUrl(v.thumb);
+      video.src=srcUrl;
+      // Sound: remember the choice once the viewer unmutes, so the next videos start with sound.
+      video.addEventListener('volumechange', function(){ if(!video.paused && video===teleActive) teleSound=!video.muted; });
+      // A pause the viewer made by hand is respected until they press play again.
+      video.addEventListener('pause', function(){ if(teleProg.has(video)){ teleProg.delete(video); return; } if(!video.ended && !video.seeking) teleUserPaused.add(video); });
+      video.addEventListener('play', function(){ teleUserPaused.delete(video); });
+      video.addEventListener('ended', function(){ // go on to the next video
+        teleDone.add(video);
+        let n=card.nextElementSibling;
+        if(!n && !teleMore.hidden){ renderTele(false); n=card.nextElementSibling; }
+        const nv=n && n.querySelector('video');
+        if(nv){ n.scrollIntoView({behavior:'smooth',block:'center'}); playTele(nv); }
+      });
+      let retried=false;
+      video.addEventListener('error', function(){
+        const e=video.error; // 1 aborted, 2 network/stream broke, 3 cannot decode, 4 format/source not supported
+        console.warn('[Tele..VDO] video #'+v.id+' failed: code '+(e&&e.code)+' '+((e&&e.message)||'')+' - open /diag/'+v.id+' on the server to see why');
+        // First failure: try the stream once more (a Telegram link can expire). Second: Telegram's own player.
+        if(!retried){ retried=true; video.src=srcUrl+(srcUrl.indexOf('?')<0?'?':'&')+'r='+Date.now(); video.load(); if(video===teleActive) playTele(video); return; }
+        if(frame.parentNode){ teleRatios.delete(video); frame.replaceWith(teleEmbedFrame(v.id)); }
+      });
+      frame.appendChild(video);
+      if(teleObserver) teleObserver.observe(video);
+    } else {
+      frame=teleEmbedFrame(v.id); // no direct link available: use Telegram's own player
+    }
+
+    const meta=document.createElement('div'); meta.className='video-meta';
+    const left=document.createElement('span'); left.textContent='Streams from Telegram'+(v.duration?' · '+v.duration:'')+(v.size?' · '+(v.size>=1073741824?(v.size/1073741824).toFixed(1)+' GB':Math.max(1,Math.round(v.size/1048576))+' MB'):'');
+    const right=document.createElement('span');
+    const d=v.date?new Date(v.date):null;
+    right.textContent=(d&&!isNaN(d))?d.toLocaleDateString():('#'+v.id);
+    meta.append(left,right);
+    card.append(head,frame,meta);
+    return card;
+  }
+
+  function renderTele(reset){
+    if(reset){ teleGrid.replaceChildren(); teleShown=0; }
+    const list=teleFiltered();
+    const next=list.slice(teleShown,teleShown+TELE_PAGE);
+    next.forEach(function(v){ teleGrid.appendChild(makeTeleCard(v)); });
+    teleShown+=next.length;
+    teleMore.hidden=teleShown>=list.length;
+    teleEmpty.hidden=list.length>0;
+  }
+
+  async function loadTele(){
+    setMessage(teleStatus,'Loading videos…','');
+    try{
+      const r=await fetch(TELE_API_BASE+'/api/videos',{cache:'no-store'});
+      if(!r.ok) throw new Error('server answered '+r.status);
+      const d=await r.json();
+      teleAll=Array.isArray(d.videos)?d.videos:[];
+      teleLoadedAt=Date.now();
+      let msg=teleAll.length+' video'+(teleAll.length===1?'':'s');
+      if(d.loading) msg+=' so far, still scanning the channel. Press Refresh in a minute.';
+      if(d.error) msg+=' (last update problem: '+d.error+')';
+      setMessage(teleStatus,msg,d.error?'error':'ok');
+      renderTele(true);
+      if(!teleView.hidden) teleStartFirst();
+    }catch(e){
+      setMessage(teleStatus,'Cannot reach the video server ('+e.message+'). Start server.js, or set TELE_API_BASE.','error');
+    }
+  }
+
+  function openTele(){ if(!teleLoadedAt || Date.now()-teleLoadedAt>120000) loadTele(); }
+
+  // Telegram's player tells the page how tall it is; resize the matching iframe.
+  window.addEventListener('message', function(e){
+    if(e.origin!=='https://t.me') return;
+    let d; try{ d=typeof e.data==='string'?JSON.parse(e.data):e.data; }catch(err){ return; }
+    if(!d||d.event!=='resize'||!d.height) return;
+    const frames=teleGrid.querySelectorAll('iframe');
+    for(let i=0;i<frames.length;i++){
+      if(frames[i].contentWindow===e.source){ frames[i].style.height=Math.max(80,Math.min(Number(d.height)||0,1400))+'px'; break; }
+    }
+  });
+
+  teleTab.addEventListener('click', function(){ showView('tele'); });
+  teleSearch.addEventListener('input', function(){ renderTele(true); });
+  teleMore.addEventListener('click', function(){ renderTele(false); });
+  document.getElementById('tele-refresh').addEventListener('click', loadTele);
+  document.getElementById('back-home-tele').addEventListener('click', function(){ showView('home'); path=[]; refreshCurrent(false); });
+
+  // Navigation Event Listeners
+  homeTab.addEventListener('click', function(){ path=[]; showView('home'); refreshCurrent(false); });
+  uploadTab.addEventListener('click', function(){ showView('upload'); });
+  settingsTab.addEventListener('click', function(){ showView('settings'); renderSettings(); });
+
+  openDriveUploadBtn.addEventListener('click', function(){
+    const link = targetFolderSelect.value || DEFAULT_FOLDER.link;
+    window.open(link, '_blank', 'noopener,noreferrer');
+  });
+
+  document.getElementById('back-home-upload').addEventListener('click', function(){ showView('home'); });
+  document.getElementById('empty-settings-button').addEventListener('click', function(){ showView('settings'); });
+  document.getElementById('back-home').addEventListener('click', function(){ showView('home'); path=[]; refreshCurrent(false); });
+  document.getElementById('refresh-button').addEventListener('click', function(){ refreshCurrent(false); });
+  document.getElementById('add-folder-button').addEventListener('click', addFolder);
+  document.getElementById('save-edit').addEventListener('click', saveEdit);
+  document.getElementById('cancel-edit').addEventListener('click', closeEdit);
+
+  function csvEscape(value){
+    const text = String(value == null ? '' : value);
+    return /[",\r\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
+  }
+
+  function parseCsv(text){
+    const rows = [];
+    let row = [], field = '', quoted = false;
+    text = String(text || '').replace(/^\uFEFF/, '');
+
+    // Support CSV files exported by an earlier version that wrote escape
+    // sequences such as "\uFEFF" and "\r\n" literally.
+    if(text.startsWith('\\uFEFF')) text = text.slice(6);
+    if(text.includes('\\r\\n') && !text.includes('\r\n')) {
+      text = text.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n');
+    }
+
+    for(let i = 0; i < text.length; i++){
+      const ch = text[i];
+      if(quoted){
+        if(ch === '"' && text[i + 1] === '"'){ field += '"'; i++; }
+        else if(ch === '"') quoted = false;
+        else field += ch;
+      } else if(ch === '"' && field === ''){
+        quoted = true;
+      } else if(ch === ','){
+        row.push(field); field = '';
+      } else if(ch === '\n' || ch === '\r'){
+        if(ch === '\r' && text[i + 1] === '\n') i++;
+        row.push(field); rows.push(row); row = []; field = '';
+      } else {
+        field += ch;
+      }
+    }
+    if(quoted) throw new Error('CSV contains an unclosed quoted field.');
+    if(field !== '' || row.length){
+      row.push(field); rows.push(row);
+    }
+    return rows.filter(r => r.some(cell => String(cell).trim() !== ''));
+  }
+
+  function exportCsv(){
+    try {
+      const list = loadLocalFolders();
+      const rows = [['name', 'link', 'id', 'key']];
+      list.forEach(f => rows.push([f.name || '', f.link || '', f.id || '', f.key || '']));
+      const csv = '\uFEFF' + rows.map(row => row.map(csvEscape).join(',')).join('\r\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'drive-folders-' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setMessage(csvStatus, 'Exported ' + list.length + ' folder' + (list.length === 1 ? '' : 's') + ' to CSV.', 'ok');
+    } catch(error) {
+      setMessage(csvStatus, error.message || 'Could not export CSV.', 'error');
+    }
+  }
+
+  async function importCsvFile(file){
+    if(!file) return;
+    importCsvButton.disabled = true;
+    setMessage(csvStatus, 'Reading CSV file…', '');
+    try {
+      const rows = parseCsv(await file.text());
+      if(!rows.length) throw new Error('The CSV file is empty.');
+      const headers = rows.shift().map(h => h.trim().replace(/^\uFEFF/, '').toLowerCase());
+      const nameIndex = headers.indexOf('name');
+      const linkIndex = headers.indexOf('link');
+      const idIndex = headers.indexOf('id');
+      if(linkIndex === -1 && idIndex === -1) {
+        throw new Error('CSV must include a "link" or "id" column. Expected columns: name,link.');
+      }
+
+      const list = loadLocalFolders();
+      const knownIds = new Set(list.map(f => {
+        try { return extractFolderId(f.link || f.id); } catch(e) { return ''; }
+      }));
+      let added = 0, skipped = 0, invalid = 0;
+      rows.forEach(row => {
+        try {
+          const rawLink = linkIndex >= 0 ? (row[linkIndex] || '').trim() : '';
+          const rawId = idIndex >= 0 ? (row[idIndex] || '').trim() : '';
+          const id = extractFolderId(rawLink || rawId);
+          if(knownIds.has(id)){ skipped++; return; }
+          const name = ((nameIndex >= 0 ? row[nameIndex] : '') || '').trim().slice(0, 80) || 'Public Drive folder';
+          const link = 'https://drive.google.com/drive/folders/' + id;
+          list.push({ key: 'folders/' + id, id: id, name: name, link: link });
+          knownIds.add(id);
+          added++;
+        } catch(e) { invalid++; }
+      });
+      if(added === 0 && invalid > 0) {
+        throw new Error('No valid folders found. Check the CSV columns and Drive links.');
+      }
+      saveLocalFolders(list);
+      path = [];
+      await refreshCurrent(false);
+      setMessage(csvStatus, 'Import complete: ' + added + ' added, ' + skipped + ' duplicate(s) skipped, ' + invalid + ' invalid row(s) skipped.', added ? 'ok' : '');
+    } catch(error) {
+      setMessage(csvStatus, error.message || 'Could not import CSV.', 'error');
+    } finally {
+      importCsvButton.disabled = false;
+      csvFilePicker.value = '';
+    }
+  }
+  importCsvButton.addEventListener('click', function(){ csvFilePicker.click(); });
+  csvFilePicker.addEventListener('change', function(){ importCsvFile(csvFilePicker.files && csvFilePicker.files[0]); });
+  exportCsvButton.addEventListener('click', exportCsv);
+  editDialog.addEventListener('click', function(e){ if(e.target === editDialog) closeEdit(); });
+  search.addEventListener('input', renderBrowse);
+
+  refreshCurrent(false);
+  timer = window.setInterval(function(){ refreshCurrent(true); }, REFRESH_MS);
+})();
+</script>
+</body>
+</html>
