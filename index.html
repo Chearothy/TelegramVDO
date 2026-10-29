@@ -286,6 +286,7 @@ button,input,select{max-width:100%;}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important;}}
 </style>
 
+<script src="/config.js"></script>
 <script>
 (function(){'use strict';
   const GOOGLE_API_KEY = 'AIzaSyAm_zSnfZuzMw6_QW107prTboJM61N5WIg';
@@ -294,7 +295,7 @@ button,input,select{max-width:100%;}
   const TELEGRAM_CHANNEL = 'rothy_video_library';
   // Address of the Tele..VDO server (server.js). Leave '' when server.js also serves this page.
   // If this page is hosted somewhere else, put the server address here, e.g. 'https://my-app.onrender.com'
-  const TELE_API_BASE = '';
+  const TELE_API_BASE = String(window.TELE_API_BASE || '').trim().replace(/\/+$/, '');
   const DEFAULT_FOLDER = {
     key: 'folders/1nUBqI5gKYmWwTuoQAMj9T-0y6_mxaq_6',
     id: '1nUBqI5gKYmWwTuoQAMj9T-0y6_mxaq_6',
@@ -926,7 +927,11 @@ button,input,select{max-width:100%;}
       renderTele(true);
       if(!teleView.hidden) teleStartFirst();
     }catch(e){
-      setMessage(teleStatus,'Cannot reach the video server ('+e.message+'). Start server.js, or set TELE_API_BASE.','error');
+      const detail = e && e.message ? e.message : String(e);
+      const hint = TELE_API_BASE
+        ? ' Check that the backend is online and ALLOWED_ORIGIN includes https://telegram-vdo.vercel.app.'
+        : ' This Vercel site needs the separate Telegram backend URL in config.js. Deploy the backend first, then set window.TELE_API_BASE.';
+      setMessage(teleStatus,'Cannot reach the video server ('+detail+').'+hint,'error');
     }
   }
 
